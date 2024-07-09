@@ -7,6 +7,7 @@ const {
   deleteScheduledEmailByIdHelper,
 } = require("../utils/scheduler.js");
 require("dotenv").config();
+
 // Nodemailer transporter setup (replace with your email service credentials)
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -54,10 +55,15 @@ const scheduleEmail = (req, res) => {
     schedule: cronExpression,
   });
 
-  cron.schedule(cronExpression, () => {
-    sendEmail(recipient, subject, body);
-    console.log(`Email sent to ${recipient} at ${new Date().toLocaleString()}`);
-  });
+  getScheduledEmailByIdHelper(id).cronJob = cron.schedule(
+    cronExpression,
+    () => {
+      sendEmail(recipient, subject, body);
+      console.log(
+        `Email sent to ${recipient} at ${new Date().toLocaleString()}`
+      );
+    }
+  );
 
   res.json({ message: "Email scheduled successfully", id });
 };
@@ -80,6 +86,13 @@ const getScheduledEmailById = (req, res) => {
 const cancelScheduledEmail = (req, res) => {
   const id = parseInt(req.params.id);
   const deleted = deleteScheduledEmailByIdHelper(id);
+  const email = getScheduledEmailByIdHelper(id);
+  if (email) {
+    // Stop the cron job associated with the email
+    if (email.cronJob) {
+      email.cronJob.destroy();
+    }
+  }
   if (deleted) {
     res.json({ message: `Scheduled email with id ${id} has been cancelled` });
   } else {
