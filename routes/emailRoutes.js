@@ -7,7 +7,9 @@ const {
   cancelScheduledEmail,
 } = require("../controllers/emailController.js");
 
-
+router.get("/", (req, res) => {
+  res.json({ message: "Email Scheduler API" });
+});
 router.post("/schedule-email", scheduleEmail);
 
 router.get("/scheduled-emails", getAllScheduledEmails);
