@@ -19,3 +19,4 @@ This API allows you to schedule and manage emails.
     "body": "This is a test email message.",
     "schedule": "2024-07-09T22:51:00Z"
   }
+More endpoints are available.
